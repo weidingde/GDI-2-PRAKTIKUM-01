@@ -3,6 +3,7 @@ package math;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import core.Calculator;
 import core.IListElement;
@@ -22,7 +23,11 @@ public class PointNumberCalculator extends Calculator
 	public void add(IListElement leftOperand) throws IllegalArgumentException {
 		super.add(leftOperand);
 		
-		// TODO implement this method in task 2.
+		BigDecimal operand1 = new BigDecimal(leftOperand.data()); // change string to bigdecimal
+		BigDecimal operand2 = new BigDecimal (leftOperand.next().next().data());
+		BigDecimal result = operand1.add(operand2); // count the result of two decimals
+		leftOperand.setData(result.toString()); // set the value to leftoperand
+		leftOperand.setNext(leftOperand.next().next().next()); //set the next value
 
 	}
 
@@ -33,7 +38,11 @@ public class PointNumberCalculator extends Calculator
 	public void sub(IListElement leftOperand) throws IllegalArgumentException {
 		super.sub(leftOperand);
 		
-		// TODO implement this method in task 2.
+		BigDecimal operand1 = new BigDecimal(leftOperand.data()); // change string to bigdecimal
+		BigDecimal operand2 = new BigDecimal (leftOperand.next().next().data());
+		BigDecimal result = operand1.subtract(operand2); // count the result of two decimals
+		leftOperand.setData(result.toString()); // set the value to leftoperand
+		leftOperand.setNext(leftOperand.next().next().next()); //set the next value
 	}
 	
 
@@ -44,7 +53,11 @@ public class PointNumberCalculator extends Calculator
 	public void mul(IListElement leftOperand) throws IllegalArgumentException {
 		super.mul(leftOperand);
 		
-		// TODO implement this method in task 2.
+		BigDecimal operand1 = new BigDecimal(leftOperand.data()); // change string to bigdecimal
+		BigDecimal operand2 = new BigDecimal (leftOperand.next().next().data());
+		BigDecimal result = operand1.multiply(operand2); // count the result of two decimals
+		leftOperand.setData(result.toString()); // set the value to leftoperand
+		leftOperand.setNext(leftOperand.next().next().next()); //set the next value
 	}
 	
 	/**
@@ -54,6 +67,10 @@ public class PointNumberCalculator extends Calculator
 	public void div(IListElement leftOperand) throws IllegalArgumentException {
 		super.div(leftOperand);
 		
-		// TODO implement this method in task 2.
+		BigDecimal operand1 = new BigDecimal(leftOperand.data()); // change string to bigdecimal
+		BigDecimal operand2 = new BigDecimal (leftOperand.next().next().data());
+		BigDecimal result = operand1.multiply(operand2); // count the result of two decimals
+		leftOperand.setData(result.toString()); // set the value to leftoperand
+		leftOperand.setNext(leftOperand.next().next().next()); //set the next value
 	}
 }
