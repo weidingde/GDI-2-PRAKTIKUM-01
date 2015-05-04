@@ -81,7 +81,7 @@ public class MathList extends LinkedList<MathElement> {
 	 */
 	@Override
 	public void addElement(MathElement mathElement) {
-		if (this.first == null) // if the list ist empty
+		if (this.first == null) // if the list is empty
 			this.first = mathElement;
 
 		else // if the list is not empty, make pivot locate at the end of list
@@ -117,20 +117,22 @@ public class MathList extends LinkedList<MathElement> {
 	 * numbers will be joined, each one in a MathElement
 	 */
 	public void assembleNumbers() {
-		// TODO implement this in task 1
+
 		if(this.first != null) {
 			IListElement pivot = this.first;
 			
 			while(pivot.hasNext()){
+				// use regex to decide whether the data is number or point, 
 				if(pivot.data().matches("[0-9\\.]+") && pivot.next().data().matches("[0-9\\.]")){
-					pivot.setData(pivot.data() + pivot.next().data());
-					pivot.setNext(pivot.next().next());
+					// if this data and next data are all numbers than can be assembled
+					pivot.setData(pivot.data() + pivot.next().data()); //connect two string
+					pivot.setNext(pivot.next().next()); //delete the next data
 				}
-				else{
+				else{ //else point to the next and check next
 					pivot = pivot.next();
 				}
 			}
-			this.last = (MathElement) pivot;
+			this.last = (MathElement) pivot; //reset the pointers
 		}
 	}
 
@@ -152,6 +154,7 @@ public class MathList extends LinkedList<MathElement> {
 	public boolean isAtom() {
 		boolean flag = false;
 		if(this.first.data().matches("[-]{0,1}[0-9//.]+") && !this.first.hasNext()){
+			// if the data is number or - and there is no next data
 			flag = true;
 		}
 		return flag;
@@ -165,13 +168,14 @@ public class MathList extends LinkedList<MathElement> {
 	 */
 	public IListElement findMulOrDivOperation() {
 		IListElement leftOperand = this.first;
-		IListElement flag = null;
+		IListElement flag = null; //set a flag to return
 		while(leftOperand != null && leftOperand.hasNext()){
 			if((leftOperand.next().data().equals(Calculator.SIGN_MUL) || 
 					leftOperand.next().data().equals(Calculator.SIGN_DIV))
 					&& leftOperand.data().matches("[-]{0,1}[0-9\\.]+")){
-				flag = leftOperand;
-				break;
+				//if the data is number and Mul or Div are found in the next position
+				flag = leftOperand; //set flag to the position
+				break; //find Mul or Div, break
 			}
 			else {
 				leftOperand = leftOperand.next();
@@ -180,10 +184,17 @@ public class MathList extends LinkedList<MathElement> {
 		return flag;
 	}
 
+	/**
+	 * creat my method to run the findMulOrDivOperation in interval
+	 * @param begin: interval begin
+	 * @param end: interval end
+	 * @return
+	 */
 	public IListElement myFindMulOrDivOperation(IListElement begin, IListElement end) {
 		IListElement leftOperand = begin;
 		IListElement flag = null;
-		while(leftOperand != null && leftOperand.hasNext() && leftOperand != end){
+		while(leftOperand != null && leftOperand.hasNext() && leftOperand != end){ 
+			//add an condition for stop search if the interval is end
 			if(leftOperand.data().matches("[-]{0,1}[0-9\\.]+") &&
 					(leftOperand.next().data().equals(Calculator.SIGN_MUL) || 
 					leftOperand.next().data().equals(Calculator.SIGN_DIV))){
@@ -197,6 +208,12 @@ public class MathList extends LinkedList<MathElement> {
 		return flag;
 	}
 	
+	/**
+	 * creat my method to run the findAddOrSubOperation in interval
+	 * @param begin: interval begin
+	 * @param end: interval end
+	 * @return
+	 */
 	public IListElement myFindAddOrSubOperation(IListElement begin, IListElement end) {
 		IListElement leftOperand = begin;
 		IListElement flag = null;
@@ -227,6 +244,7 @@ public class MathList extends LinkedList<MathElement> {
 			if(leftOperand.data().matches("[-]{0,1}[0-9\\.]+") &&
 					(leftOperand.next().data().equals(Calculator.SIGN_ADD) || 
 					leftOperand.next().data().equals(Calculator.SIGN_SUB))){
+				//if the data is number and ADD or SUB are found in the next position
 				flag = leftOperand;
 				break;
 			}
@@ -248,11 +266,11 @@ public class MathList extends LinkedList<MathElement> {
 		IListElement begin = null;
 		
 		if (this.first != null){
-			begin = this.first;
+			begin = this.first; // to store the position of the innerst parenthesis_open
 			IListElement pivot = this.first;
 			
 			while (!pivot.data().equals(Calculator.SIGN_PARENTHESIS_CLOSE) 
-					&& pivot.hasNext()){
+					&& pivot.hasNext()){// end if meet the first parenthesis_close or list is empty
 				if (pivot.data().equals(Calculator.SIGN_PARENTHESIS_OPEN)) {
 					begin = pivot;
 				}
@@ -273,9 +291,9 @@ public class MathList extends LinkedList<MathElement> {
 	 *            operand of the expression.
 	 */
 	public void evaluateSimpleExpression(IListElement begin) {
-		// TODO implement this in task 2
-		IListElement end = null;
+		IListElement end = null; //set end for interval end
 		if (begin.data().equals(Calculator.SIGN_PARENTHESIS_OPEN)) {
+			//if the interval begin is a parenthesis_open, find the position of parenthesis_close for end
 			end = begin;
 			while(!end.data().equals(Calculator.SIGN_PARENTHESIS_CLOSE)){
 				end = end.next();
@@ -283,6 +301,7 @@ public class MathList extends LinkedList<MathElement> {
 		}
 		
 		IListElement leftOperand = begin;
+		//first calculate multiple or division
 		while (this.myFindMulOrDivOperation(begin, end) != null){
 			leftOperand = this.myFindMulOrDivOperation(begin, end);
 			if (leftOperand.next().data().equals(Calculator.SIGN_MUL)){
@@ -292,7 +311,7 @@ public class MathList extends LinkedList<MathElement> {
 				this.calc.div(leftOperand);
 			}
 		}
-		
+		//then calculate addition or subtraction
 		while (this.myFindAddOrSubOperation(begin, end) != null){
 			leftOperand = this.myFindAddOrSubOperation(begin, end);
 			if (leftOperand.next().data().equals(Calculator.SIGN_ADD)){
@@ -303,7 +322,7 @@ public class MathList extends LinkedList<MathElement> {
 			}
 		}
 		
-		if (end != null) {
+		if (end != null) { //delete rest and left only the result alone
 			begin.setData(begin.next().data());
 			begin.setNext(begin.next().next().next());
 		}
@@ -314,8 +333,9 @@ public class MathList extends LinkedList<MathElement> {
 	 * with one number inside. This element is the result of the expression.
 	 */
 	public void evaluate() {
-		this.assembleNumbers();
-		while (!this.isAtom()) {
+		this.assembleNumbers(); //first, assemble the list
+		while (!this.isAtom()) { 
+			//if the list isn't atom, count the innermost express until list is atom
 			this.evaluateSimpleExpression(this.findInnermostExpression());
 		}
 	}
