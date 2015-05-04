@@ -69,7 +69,7 @@ public class PointNumberCalculator extends Calculator
 		
 		BigDecimal operand1 = new BigDecimal(leftOperand.data()); // change string to bigdecimal
 		BigDecimal operand2 = new BigDecimal (leftOperand.next().next().data());
-		BigDecimal result = operand1.multiply(operand2); // count the result of two decimals
+		BigDecimal result = operand1.divide(operand2); // count the result of two decimals
 		leftOperand.setData(result.toString()); // set the value to leftoperand
 		leftOperand.setNext(leftOperand.next().next().next()); //set the next value
 	}

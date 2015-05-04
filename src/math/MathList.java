@@ -118,39 +118,19 @@ public class MathList extends LinkedList<MathElement> {
 	 */
 	public void assembleNumbers() {
 		// TODO implement this in task 1
-		IListElement currentPivot = this.first;
-		IListElement nextPivot = this.first;
-		StringBuilder currentStr = new StringBuilder();
-
-		while (nextPivot != null) {
-			if (!nextPivot.data().matches("[0-9\\.]")) {
-				if (currentPivot.equals(nextPivot)) {
-					nextPivot = nextPivot.next();
-					currentPivot = currentPivot.next();
-				} else {
-					if (currentStr.length() != 0) {
-						currentPivot.setData(currentStr.toString());
-						currentStr.setLength(0);
-						currentPivot = currentPivot.next();
-					}
-					currentPivot.setData(nextPivot.data());
-					currentPivot = currentPivot.next();
-					nextPivot = nextPivot.next();
-				}
-			} 
+		if(this.first != null) {
+			IListElement pivot = this.first;
 			
-			else {
-				currentStr.append(nextPivot.data());
-				nextPivot=nextPivot.next();
+			while(pivot.hasNext()){
+				if(pivot.data().matches("[0-9\\.]+") && pivot.next().data().matches("[0-9\\.]")){
+					pivot.setData(pivot.data() + pivot.next().data());
+					pivot.setNext(pivot.next().next());
+				}
+				else{
+					pivot = pivot.next();
+				}
 			}
-		}
-		
-		if (currentStr.length()!= 0) {
-			currentPivot.setData(currentStr.toString());
-			currentPivot.setNext(null);
-		}
-		else{
-			currentPivot = null;
+			this.last = (MathElement) pivot;
 		}
 	}
 
@@ -170,8 +150,11 @@ public class MathList extends LinkedList<MathElement> {
 	 * @see Calculator
 	 */
 	public boolean isAtom() {
-		// TODO implement this in task 2
-		return false;
+		boolean flag = false;
+		if(this.first.data().matches("[-]{0,1}[0-9//.]+") && !this.first.hasNext()){
+			flag = true;
+		}
+		return flag;
 	}
 
 	/**
@@ -181,13 +164,71 @@ public class MathList extends LinkedList<MathElement> {
 	 * @return a pointer to a left operand
 	 */
 	public IListElement findMulOrDivOperation() {
-		// TODO implement this in task 2
 		IListElement leftOperand = this.first;
 		IListElement flag = null;
 		while(leftOperand != null && leftOperand.hasNext()){
-			if(leftOperand.next().data().equals(calc.SIGN_MUL) || 
-					leftOperand.next().data().equals(calc.SIGN_DIV)){
+			if((leftOperand.next().data().equals(Calculator.SIGN_MUL) || 
+					leftOperand.next().data().equals(Calculator.SIGN_DIV))
+					&& leftOperand.data().matches("[-]{0,1}[0-9\\.]+")){
 				flag = leftOperand;
+				break;
+			}
+			else {
+				leftOperand = leftOperand.next();
+			}
+		}
+		return flag;
+	}
+
+	public IListElement myFindMulOrDivOperation(IListElement begin, IListElement end) {
+		IListElement leftOperand = begin;
+		IListElement flag = null;
+		while(leftOperand != null && leftOperand.hasNext() && leftOperand != end){
+			if(leftOperand.data().matches("[-]{0,1}[0-9\\.]+") &&
+					(leftOperand.next().data().equals(Calculator.SIGN_MUL) || 
+					leftOperand.next().data().equals(Calculator.SIGN_DIV))){
+				flag = leftOperand;
+				break;
+			}
+			else {
+				leftOperand = leftOperand.next();
+			}
+		}
+		return flag;
+	}
+	
+	public IListElement myFindAddOrSubOperation(IListElement begin, IListElement end) {
+		IListElement leftOperand = begin;
+		IListElement flag = null;
+		while(leftOperand != null && leftOperand.hasNext() && leftOperand != end){
+			if(leftOperand.data().matches("[-]{0,1}[0-9\\.]+") &&
+					(leftOperand.next().data().equals(Calculator.SIGN_ADD) || 
+					leftOperand.next().data().equals(Calculator.SIGN_SUB))){
+				flag = leftOperand;
+				break;
+			}
+			else {
+				leftOperand = leftOperand.next();
+			}
+		}
+		return flag;
+	}
+	
+	/**
+	 * Returns a pointer to the left operand of an addition or a subtraction.
+	 * This method does not stop if a parentheses is found.
+	 * 
+	 * @return a pointer to a left operand
+	 */
+	public IListElement findAddOrSubOperation() {
+		IListElement leftOperand = this.first;
+		IListElement flag = null;
+		while(leftOperand != null && leftOperand.hasNext()){
+			if(leftOperand.data().matches("[-]{0,1}[0-9\\.]+") &&
+					(leftOperand.next().data().equals(Calculator.SIGN_ADD) || 
+					leftOperand.next().data().equals(Calculator.SIGN_SUB))){
+				flag = leftOperand;
+				break;
 			}
 			else {
 				leftOperand = leftOperand.next();
@@ -197,25 +238,29 @@ public class MathList extends LinkedList<MathElement> {
 	}
 
 	/**
-	 * Returns a pointer to the left operand of an addition or a subtraction.
-	 * This method does not stop if a parentheses is found.
-	 * 
-	 * @return a pointer to a left operand
-	 */
-	public IListElement findAddOrSubOperation() {
-		// TODO implement this in task 2
-		return null;
-	}
-
-	/**
 	 * Returns a pointer to the beginning of the first innermost expression of
 	 * the entire expression.
 	 * 
 	 * @return the beginning of the first innermost expression.
 	 */
 	public IListElement findInnermostExpression() {
-		// TODO implement this in task 2
-		return null;
+		
+		IListElement begin = null;
+		
+		if (this.first != null){
+			begin = this.first;
+			IListElement pivot = this.first;
+			
+			while (!pivot.data().equals(Calculator.SIGN_PARENTHESIS_CLOSE) 
+					&& pivot.hasNext()){
+				if (pivot.data().equals(Calculator.SIGN_PARENTHESIS_OPEN)) {
+					begin = pivot;
+				}
+				pivot = pivot.next();
+			}
+		}
+		
+		return begin;
 	}
 
 	/**
@@ -229,6 +274,39 @@ public class MathList extends LinkedList<MathElement> {
 	 */
 	public void evaluateSimpleExpression(IListElement begin) {
 		// TODO implement this in task 2
+		IListElement end = null;
+		if (begin.data().equals(Calculator.SIGN_PARENTHESIS_OPEN)) {
+			end = begin;
+			while(!end.data().equals(Calculator.SIGN_PARENTHESIS_CLOSE)){
+				end = end.next();
+			}
+		}
+		
+		IListElement leftOperand = begin;
+		while (this.myFindMulOrDivOperation(begin, end) != null){
+			leftOperand = this.myFindMulOrDivOperation(begin, end);
+			if (leftOperand.next().data().equals(Calculator.SIGN_MUL)){
+				this.calc.mul(leftOperand);
+			}
+			else {
+				this.calc.div(leftOperand);
+			}
+		}
+		
+		while (this.myFindAddOrSubOperation(begin, end) != null){
+			leftOperand = this.myFindAddOrSubOperation(begin, end);
+			if (leftOperand.next().data().equals(Calculator.SIGN_ADD)){
+				this.calc.add(leftOperand);
+			}
+			else {
+				this.calc.sub(leftOperand);
+			}
+		}
+		
+		if (end != null) {
+			begin.setData(begin.next().data());
+			begin.setNext(begin.next().next().next());
+		}
 	}
 
 	/**
@@ -236,7 +314,10 @@ public class MathList extends LinkedList<MathElement> {
 	 * with one number inside. This element is the result of the expression.
 	 */
 	public void evaluate() {
-		// TODO implement this in task 2
+		this.assembleNumbers();
+		while (!this.isAtom()) {
+			this.evaluateSimpleExpression(this.findInnermostExpression());
+		}
 	}
 
 	/**

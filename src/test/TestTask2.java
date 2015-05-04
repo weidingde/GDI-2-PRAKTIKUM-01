@@ -147,7 +147,7 @@ public class TestTask2
 		}		
 	}
 	
-	@Test(timeout = 250)
+	@Test (timeout = 250)
 	public void testEvaluateSimpleExpression()
 	{
 		ml.buildList("15*3");
@@ -186,7 +186,7 @@ public class TestTask2
 		assertEquals("Wrong element (pointer)", ml.get(5), result);
 	}
 	
-	@Test(timeout=750)
+	@Test (timeout=750)
 	public void testEvaluate()
 	{
 		String[] testCases = {
